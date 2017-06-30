@@ -3,6 +3,7 @@ package com.hello.work;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,30 +11,37 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 public class Gusano implements ApplicationListener {
 	
 	public static final int COLS = 12, ROW = 1;
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
-	private TextureRegion region;
+	private TextureRegion region, explosion;
 	private Texture img;
 	Animation<TextureRegion> attack, movel, mover;
 	private int h;
 	private int w;
 	float stateTime;
 	private int positionx, positiony;
-	boolean moveR, moveUP, moveL; 
+	boolean moveR, moveUP, moveL;
+	private ShapeRenderer shrend;
 
 	@Override
 	public void create() {
 		h = Gdx.graphics.getHeight();
 		w = Gdx.graphics.getWidth();
-		img = new Texture(Gdx.files.absolute("/home/vauxoo/workspace/texturas/gussan.png"));
+		String extRoot = Gdx.files.getLocalStoragePath();
+		img = new Texture(Gdx.files.absolute("../texturas/gussan.png"));
+		Texture explo = new Texture(Gdx.files.absolute("../texturas/explocion.jpg"));
+		
+		//img = new Texture(Gdx.files.classpath("/assets/gussan.png"));
 		TextureRegion[][] tmp = TextureRegion.split(img, img.getWidth()/COLS,
 				                                    img.getHeight()/ROW);
 		
 		region = tmp[0][0];
+		explosion = new TextureRegion(explo);
 		TextureRegion[] Attack =  new TextureRegion[4 * 1];
 		TextureRegion[] MoveLef = new TextureRegion[4 * 1];
 		TextureRegion[] MoveRig = new TextureRegion[4 * 1];
@@ -54,6 +62,7 @@ public class Gusano implements ApplicationListener {
 		mover = new Animation<TextureRegion>(0.25f, MoveRig);
 		batch = new SpriteBatch();
 		stateTime = 0f;
+		positionx = 100;
 		//camera = new OrthographicCamera();
 		//camera.setToOrtho(false, w, h);
 		
@@ -79,10 +88,15 @@ public class Gusano implements ApplicationListener {
 			currentFrame = attack.getKeyFrame(stateTime, true);
 		}
 		
+		if (positionx == 10 || positionx <= 40){
+			currentFrame = explosion;
+			
+		}
+		
 		batch.begin();
 		batch.draw(currentFrame, positionx, positiony);
 		batch.end();
-		
+		create_shape(10, 0);
 	}
 
 	@Override
@@ -101,6 +115,7 @@ public class Gusano implements ApplicationListener {
 	public void dispose() {
 		batch.dispose();
 		img.dispose();
+		 shrend.dispose();
 		
 	}
 
@@ -109,5 +124,16 @@ public class Gusano implements ApplicationListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void create_shape(int x, int y){
+		shrend = new ShapeRenderer();
+		shrend.begin(ShapeType.Filled);
+	    shrend.setColor(Color.RED);
+	    shrend.rect(x, y, 30, h);
+	    shrend.end();
+	   
+		
+	}
+	
 
 }
